@@ -1,0 +1,25 @@
+{
+  "name": "masteel",
+  "version": "1.0.0",
+  "description": "Competitive Intelligence Agent — Steel cloud browser + Mastra agent",
+  "private": true,
+  "scripts": {
+    "start": "npx tsx src/index.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.25",
+    "@mastra/core": "latest",
+    "dotenv": "latest",
+    "playwright": "latest",
+    "steel-sdk": "latest",
+    "turndown": "latest",
+    "turndown-plugin-gfm": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/turndown": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}
