@@ -46,7 +46,7 @@ CLI args (competitor URLs)
 | Decision | Why |
 |---|---|
 | Single Steel session reused across all tool calls | Efficient, preserves the browser fingerprint, and all activity shows up in Steel's live viewer |
-| Three tools instead of one big scraper | `searchForPage` makes the agent's reasoning *visible* — it's the demo's wow factor |
+| Three tools instead of one big scraper | `searchForPage` makes the agent's reasoning *visible*  |
 | Turndown + GFM tables plugin | Pricing tables survive the HTML→Markdown conversion |
 | `onStepFinish` callback | Every agent step (reasoning + tool calls + results) streams to the terminal in real time |
 | `writeReport` is a tool, not post-processing | Keeps the agent's final output action visible in the step log |
