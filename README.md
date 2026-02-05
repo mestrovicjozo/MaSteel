@@ -1,214 +1,140 @@
 # MaSteel — Competitive Intelligence Agent
 
-> An AI-powered tool that automatically visits competitor websites, gathers information about their pricing, features, and offerings, and creates a neat summary report for you.
+> Drop in competitor URLs. Get a detailed report. No manual research required.
+
+MaSteel is an AI agent that takes a list of base URLs, autonomously navigates competitor websites — including JavaScript-heavy sites with hidden menus — and produces a structured competitive intelligence report covering pricing, features, positioning, and more.
 
 ---
 
-## What does this do?
+## How it works
 
-You give it a list of competitor websites, and it:
-1. Visits each website (like a real person would)
-2. Finds their pricing pages, features, and other important info
-3. Reads and understands the content
-4. Writes a structured report comparing all competitors
+You give it base URLs. It does everything else:
 
-The result is a `report.md` file you can read or share.
+```bash
+npm start https://stripe.com https://www.adyen.com
+```
+
+The agent will:
+1. **Scrape each homepage** to understand company positioning
+2. **Search for subpages** (pricing, features, about) by scanning links
+3. **Explore hidden navigation** — hovers over dropdown menus, clicks hamburger buttons, scrolls to footers — to discover links that aren't in the static HTML
+4. **Scrape discovered pages** for detailed pricing, features, and company info
+5. **Write a structured report** comparing all competitors
+
+The result is a `report.md` file ready to read or share. See [example_report.md](example_report.md) for a finished report.
+
+### Why just base URLs?
+
+Most competitive intel tools require you to manually find and feed in every subpage URL. MaSteel doesn't. Its `explore-navigation` tool interacts with the page like a real user — hovering over nav items to reveal dropdowns, clicking mobile menu buttons — so it discovers pages that static link scrapers miss entirely. Sites like Braintree, which hide everything behind JavaScript navigation, work out of the box.
+
+---
+
+## Built with
+
+| Technology | Role |
+|-----------|------|
+| [**Steel**](https://steel.dev) | Cloud browser that bypasses bot detection, solves CAPTCHAs, and provides a live viewer to watch the agent browse in real time |
+| [**Mastra**](https://mastra.ai) | TypeScript AI agent framework that gives GPT-4o tools to control the browser and make decisions |
+| [**Playwright**](https://playwright.dev) | Browser automation — handles hover interactions, clicks, and DOM extraction |
+| [**OpenAI**](https://platform.openai.com) | GPT-4o-mini powers the agent's reasoning and report generation |
 
 ---
 
 ## Prerequisites
 
-Before you start, you'll need:
-
-| Requirement | What it is | Where to get it |
-|-------------|-----------|-----------------|
-| **Node.js** (v18+) | JavaScript runtime that runs the code | [nodejs.org](https://nodejs.org) — download the LTS version |
-| **OpenAI API key** | Lets the AI understand and analyze websites | [platform.openai.com](https://platform.openai.com) — create account, go to API Keys |
-| **Steel API key** | Provides a cloud browser that won't get blocked | [app.steel.dev](https://app.steel.dev) — create account, copy your API key |
-
-**How to check if Node.js is installed:**
-```bash
-node --version
-```
-If you see a version number (like `v20.10.0`), you're good. If not, install Node.js first.
+| Requirement | Where to get it |
+|-------------|-----------------|
+| **Node.js** v18+ | [nodejs.org](https://nodejs.org) (LTS version) |
+| **OpenAI API key** | [platform.openai.com](https://platform.openai.com) → API Keys |
+| **Steel API key** | [app.steel.dev](https://app.steel.dev) → copy your API key |
 
 ---
 
 ## Quick Start
 
-### Step 1: Download the project
-
 ```bash
+# 1. Clone and install
 git clone <repo-url>
 cd MaSteel
-```
-
-### Step 2: Install dependencies
-
-This downloads all the code libraries the project needs:
-
-```bash
 npm install
-```
 
-### Step 3: Set up your API keys
-
-Run this command to create your configuration file:
-
-```bash
+# 2. Set up API keys
 npm run setup
-```
+# Edit .env with your real keys:
+#   OPENAI_API_KEY=sk-proj-...
+#   STEEL_API_KEY=steel_...
 
-Now open the `.env` file in any text editor (Notepad, VS Code, etc.) and replace the placeholder text with your real API keys:
-
-```
-OPENAI_API_KEY=sk-proj-abc123...your-real-key-here
-STEEL_API_KEY=steel_abc123...your-real-key-here
-```
-
-**Important:** Keep your API keys secret. Never share them or commit them to git.
-
-### Step 4: Verify everything is set up
-
-```bash
+# 3. Verify setup
 npm run check-env
+
+# 4. Run it
+npm start https://stripe.com https://www.adyen.com
 ```
 
-If you see `Environment OK`, you're ready to go. If it shows errors, double-check your `.env` file.
-
-### Step 5: Run it
-
-```bash
-npm start https://stripe.com https://braintree.com https://adyen.com
-```
-
-Replace those URLs with any competitor websites you want to research.
-
-When it finishes, you'll find a `report.md` file in the project folder with all the gathered intelligence.
+When it finishes, open `report.md` for the full competitive analysis.
 
 ---
 
-## Tips for Better Results
+## What the agent does under the hood
 
-### Use specific page URLs, not just homepages
-
-The agent works best when you give it direct links to the pages you care about. Instead of just the homepage, include pricing and about pages:
-
-```bash
-# Basic (homepage only - agent must find subpages itself)
-npm start https://braintree.com
-
-# Better (include specific pages you want analyzed)
-npm start https://braintree.com https://www.braintreepayments.com/features https://www.braintreepayments.com/about
+```
+  Base URLs (e.g. https://stripe.com)
+          │
+          ▼
+    scrape-url ──────── Scrapes homepage content
+          │
+          ▼
+    search-for-page ─── Scans <a> links for keywords like "pricing"
+          │
+          │  (0 results?)
+          ▼
+    explore-navigation ─ Hovers nav items, clicks hamburger menus,
+          │               scrolls to footer — discovers hidden links
+          ▼
+    scrape-url ──────── Scrapes discovered subpages
+          │
+          ▼
+    write-report ────── Generates the final markdown report
 ```
 
-### Why this matters
+All browsing happens through **Steel's cloud browser** — bot detection, CAPTCHAs, and IP rotation are handled automatically. You can watch the agent work in real time via the live viewer URL printed at startup.
 
-Some websites (like Braintree) use JavaScript navigation or don't have obvious "pricing" links on their homepage. The agent's `searchForPage` tool looks for links containing keywords like "pricing" — if those links don't exist or use different text, the agent won't find them.
+---
 
-**How to find the right URLs:**
-1. Visit the competitor's website in your browser
-2. Navigate to their pricing, features, or about pages
-3. Copy those exact URLs and pass them to the agent
+## Architecture
 
-### Example with multiple specific pages
-
-```bash
-npm start \
-  https://stripe.com \
-  https://stripe.com/pricing \
-  https://www.braintreepayments.com \
-  https://www.braintreepayments.com/features \
-  https://adyen.com \
-  https://www.adyen.com/pricing
+```
+src/
+  index.ts              ── Entry point, manages Steel session lifecycle
+  agent.ts              ── Mastra AI agent with GPT-4o-mini + tool definitions
+  session.ts            ── Steel session + Playwright CDP connection (singleton)
+  tools/
+    scrapeUrl.ts        ── Visits a URL, extracts content as markdown
+    searchForPage.ts    ── Finds links matching a keyword (with dedup cache)
+    exploreNavigation.ts── Hovers/clicks nav elements to reveal hidden links
+    writeReport.ts      ── Writes the final report to disk
 ```
 
-This gives the agent direct access to the pages you care about, instead of hoping it discovers them.
-
-
-Please check example_report.md for a finished report.
 ---
 
 ## Available Commands
 
 | Command | What it does |
 |---------|--------------|
-| `npm install` | Downloads all required dependencies (run once) |
+| `npm start <urls>` | Runs the agent on the given competitor URLs |
 | `npm run setup` | Creates your `.env` configuration file |
 | `npm run check-env` | Verifies your API keys are set correctly |
-| `npm start <urls>` | Runs the agent on the given competitor URLs |
-| `npm run dev <urls>` | Same as `npm start` (alias) |
 
 ---
 
 ## Troubleshooting
 
-### "command not found: npm"
-You need to install Node.js. Download it from [nodejs.org](https://nodejs.org).
-
-### "Missing or invalid env vars"
-Your `.env` file is missing or the API keys aren't filled in. Run `npm run setup` and edit the `.env` file with your real keys.
-
-### "OPENAI_API_KEY is not set"
-Make sure your `.env` file has `OPENAI_API_KEY=sk-...` (with your actual key, no spaces around the `=`).
-
-### The agent gets blocked or sees blank pages
-This usually means Steel's session expired or there's an issue with your Steel API key. Check your key at [app.steel.dev](https://app.steel.dev).
-
-### "Cannot find module" errors
-Run `npm install` again to make sure all dependencies are downloaded.
-
----
-
-## How it works (technical overview)
-
-The project uses two main technologies:
-
-- **Steel** — A cloud browser service that browses websites like a real human. It handles CAPTCHAs, avoids bot detection, and rotates IP addresses automatically.
-- **Mastra** — An AI agent framework that lets GPT-4 control the browser, decide which pages to visit, and understand the content.
-
-### Architecture
-
-```
-Your command (competitor URLs)
-        │
-        ▼
-  src/index.ts        ── Entry point, manages the session
-        │
-        ▼
-  src/agent.ts        ── AI Agent (GPT-4o) that decides what to do
-        │
-        ▼
-  src/tools/
-    scrapeUrl.ts      ── Visits a URL and extracts content
-    searchForPage.ts  ── Finds links on a page (e.g., "pricing")
-    writeReport.ts    ── Saves the final report
-        │
-        ▼
-  Steel Cloud         ── Anti-bot browser in the cloud
-        │
-        ▼
-  Real Websites
-```
-
-### Why Steel?
-
-Real competitor sites (Stripe, Braintree, etc.) use bot detection. A normal script gets blocked instantly. Steel's cloud browser:
-
-- Looks like a real person to bot detectors
-- Solves CAPTCHAs automatically
-- Rotates IP addresses to avoid blocks
-- Shows you a live view of the browser working
-
----
-
-## Extending the project
-
-| Goal | How to do it |
-|------|--------------|
-| Research different data | Add new tools in `src/tools/` for keywords like "testimonials" or "careers" |
-| Use a different AI model | Change `openai("gpt-4o")` in `src/agent.ts` |
-| Run on a schedule | Set up a cron job or scheduled task to run `npm start` periodically |
+| Problem | Fix |
+|---------|-----|
+| `command not found: npm` | Install Node.js from [nodejs.org](https://nodejs.org) |
+| `Missing or invalid env vars` | Run `npm run setup` and edit `.env` with your real keys |
+| Agent gets blocked or sees blank pages | Check your Steel API key at [app.steel.dev](https://app.steel.dev) |
+| `Cannot find module` errors | Run `npm install` again |
 
 ---
 
@@ -217,4 +143,3 @@ Real competitor sites (Stripe, Braintree, etc.) use bot detection. A normal scri
 - [Steel — cloud browser sessions](https://steel.dev)
 - [Mastra — TypeScript agent framework](https://mastra.ai)
 - [OpenAI API](https://platform.openai.com)
-- [Node.js](https://nodejs.org)
