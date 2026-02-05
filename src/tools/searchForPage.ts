@@ -4,17 +4,29 @@ import { getPage } from "../session";
 
 const MAX_MATCHES = 10;
 
+// Deduplication cache: prevents the LLM from wasting steps re-searching
+// the same (baseUrl, keyword) pair that already returned 0 results.
+const searchCache = new Map<string, { baseUrl: string; keyword: string; matches: { url: string; linkText: string }[] }>();
+
 export const searchForPage = createTool({
   id: "search-for-page",
   description:
     "Navigates to a base URL and discovers sub-pages by scanning all <a> links on the page. " +
     "Filters links whose href or visible text contains the keyword (case-insensitive). " +
-    "Use this BEFORE scrape-url to find the correct URL for a topic like 'pricing', 'features', or 'docs'.",
+    "Use this BEFORE scrape-url to find the correct URL for a topic like 'pricing', 'features', or 'docs'. " +
+    "Results are cached — calling with the same baseUrl and keyword twice returns the cached result instantly.",
   inputSchema: z.object({
     baseUrl: z.string().url().describe("The homepage or base URL to scan for links"),
     keyword: z.string().describe("Keyword to search for in link hrefs and text (e.g. 'pricing', 'features')"),
   }),
   execute: async ({ baseUrl, keyword }) => {
+    const cacheKey = `${baseUrl}::${keyword.toLowerCase()}`;
+    const cached = searchCache.get(cacheKey);
+    if (cached) {
+      console.log(`  [search-for-page] Cache hit for ${baseUrl} "${keyword}" → ${cached.matches.length} match(es)`);
+      return cached;
+    }
+
     const page = await getPage();
 
     try {
@@ -57,11 +69,15 @@ export const searchForPage = createTool({
       }
 
       console.log(`  [search-for-page] Found ${matches.length} match(es)`);
-      return { baseUrl, keyword, matches };
+      const result = { baseUrl, keyword, matches };
+      searchCache.set(cacheKey, result);
+      return result;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.log(`  [search-for-page] Error on ${baseUrl}: ${message}`);
-      return { baseUrl, keyword, matches: [] };
+      const result = { baseUrl, keyword, matches: [] as { url: string; linkText: string }[] };
+      searchCache.set(cacheKey, result);
+      return result;
     } finally {
       await page.close();
     }
