@@ -2,7 +2,7 @@
 ## Mastra + Steel
 > Drop in competitor URLs. Get a detailed report. No manual research required.
 
-MaSteel is an AI agent that takes a list of base URLs, autonomously navigates competitor websites — including JavaScript-heavy sites with hidden menus — and produces a structured competitive intelligence report covering pricing, features, positioning, and more.
+MaSteel is an AI agent that takes a list of base URLs, autonomously navigates competitor websites — including JavaScript-heavy sites with hidden menus — and produces a structured competitive intelligence report covering pricing, features, positioning, and more. [See an example report →](example_report.md)
 
 ---
 
