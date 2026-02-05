@@ -86,6 +86,45 @@ Replace those URLs with any competitor websites you want to research.
 
 When it finishes, you'll find a `report.md` file in the project folder with all the gathered intelligence.
 
+---
+
+## Tips for Better Results
+
+### Use specific page URLs, not just homepages
+
+The agent works best when you give it direct links to the pages you care about. Instead of just the homepage, include pricing and about pages:
+
+```bash
+# Basic (homepage only - agent must find subpages itself)
+npm start https://braintree.com
+
+# Better (include specific pages you want analyzed)
+npm start https://braintree.com https://www.braintreepayments.com/features https://www.braintreepayments.com/about
+```
+
+### Why this matters
+
+Some websites (like Braintree) use JavaScript navigation or don't have obvious "pricing" links on their homepage. The agent's `searchForPage` tool looks for links containing keywords like "pricing" — if those links don't exist or use different text, the agent won't find them.
+
+**How to find the right URLs:**
+1. Visit the competitor's website in your browser
+2. Navigate to their pricing, features, or about pages
+3. Copy those exact URLs and pass them to the agent
+
+### Example with multiple specific pages
+
+```bash
+npm start \
+  https://stripe.com \
+  https://stripe.com/pricing \
+  https://www.braintreepayments.com \
+  https://www.braintreepayments.com/features \
+  https://adyen.com \
+  https://www.adyen.com/pricing
+```
+
+This gives the agent direct access to the pages you care about, instead of hoping it discovers them.
+
 
 Please check example_report.md for a finished report.
 ---
