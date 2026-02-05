@@ -86,6 +86,8 @@ Replace those URLs with any competitor websites you want to research.
 
 When it finishes, you'll find a `report.md` file in the project folder with all the gathered intelligence.
 
+
+Please check example_report.md for a finished report.
 ---
 
 ## Available Commands
