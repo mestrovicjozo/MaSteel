@@ -65,11 +65,13 @@ npm install
 
 ### 2. Add your API keys
 
-Copy `.env.example` to `.env` and fill in both keys:
+Run the setup script to create your `.env` file:
 
 ```bash
-cp .env.example .env
+npm run setup
 ```
+
+Then edit `.env` and fill in both keys:
 
 ```env
 OPENAI_API_KEY=sk-...
@@ -78,10 +80,16 @@ STEEL_API_KEY=your-steel-api-key-here
 
 Get a Steel key at [app.steel.dev](https://app.steel.dev).
 
+Verify your environment is configured correctly:
+
+```bash
+npm run check-env
+```
+
 ### 3. Run it
 
 ```bash
-npx tsx src/index.ts https://stripe.com https://braintree.com https://adyen.com
+npm start https://stripe.com https://braintree.com https://adyen.com
 ```
 
 A `report.md` file will appear in the project root when the agent finishes.

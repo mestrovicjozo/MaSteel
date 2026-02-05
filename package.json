@@ -4,7 +4,10 @@
   "description": "Competitive Intelligence Agent — Steel cloud browser + Mastra agent",
   "private": true,
   "scripts": {
-    "start": "npx tsx src/index.ts"
+    "start": "npx tsx src/index.ts",
+    "dev": "npx tsx src/index.ts",
+    "setup": "node -e \"const fs=require('fs'); if(!fs.existsSync('.env')){fs.copyFileSync('.env.example','.env');console.log('Created .env from .env.example — edit it with your API keys')}else{console.log('.env already exists')}\"",
+    "check-env": "node -e \"require('dotenv').config(); const missing=[]; if(!process.env.OPENAI_API_KEY||process.env.OPENAI_API_KEY.includes('your_'))missing.push('OPENAI_API_KEY'); if(!process.env.STEEL_API_KEY||process.env.STEEL_API_KEY.includes('your_'))missing.push('STEEL_API_KEY'); if(missing.length){console.error('Missing or invalid env vars:',missing.join(', '));process.exit(1)}else{console.log('Environment OK')}\""
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.25",
