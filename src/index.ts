@@ -8,12 +8,11 @@ import { setReportFilename } from "./reportContext";
 // ---------------------------------------------------------------------------
 const urls = process.argv.filter((arg) => arg.startsWith("http"));
 
-// Extract company name from URL (stripe.com -> stripe)
 function extractCompanyName(url: string): string {
   try {
     const hostname = new URL(url).hostname;
-    // Remove www. prefix and TLD (.com, .io, etc.)
-    return hostname.replace(/^www\./, '').split('.')[0];
+    const name = hostname.replace(/^www\./, '').split('.')[0];
+    return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   } catch {
     return 'unknown';
   }
@@ -25,8 +24,7 @@ if (urls.length === 0) {
   process.exit(1);
 }
 
-// Generate unique filename from company names
-const companyNames = urls.map(extractCompanyName);
+const companyNames = [...new Set(urls.map(extractCompanyName))];
 const reportFilename = `${companyNames.join('_')}_report.md`;
 setReportFilename(reportFilename);
 
