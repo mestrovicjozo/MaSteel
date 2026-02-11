@@ -5,6 +5,8 @@ import { searchForPage } from "./tools/searchForPage";
 import { exploreNavigation } from "./tools/exploreNavigation";
 import { writeReport } from "./tools/writeReport";
 
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.2";
+
 const SYSTEM_PROMPT = `You are a competitive intelligence research agent. Your job is to visit competitor websites, extract key information, and produce a thorough, detailed report.
 
 ## Workflow (follow this order)
@@ -119,7 +121,7 @@ Use this exact structure when writing the report. Be as detailed as possible —
 export const agent = new Agent({
   id: "masteel-competitive-intel",
   name: "MaSteel Competitive Intelligence Agent",
-  model: openai.chat("gpt-4o-mini"),
+  model: openai.chat(OPENAI_MODEL),
   instructions: SYSTEM_PROMPT,
   tools: { scrapeUrl, searchForPage, exploreNavigation, writeReport },
 });
