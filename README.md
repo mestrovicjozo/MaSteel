@@ -21,7 +21,7 @@ The agent will:
 4. **Scrape discovered pages** for detailed pricing, features, and company info
 5. **Write a structured report** comparing all competitors
 
-The result is a `report.md` file ready to read or share. See [example_report.md](example_report.md) for a finished report.
+The result is a markdown report named after the companies analyzed (e.g., `stripe_adyen_report.md`), so each run preserves previous reports. See [example_report.md](example_report.md) for a finished report.
 
 ### Why just base URLs?
 
@@ -71,7 +71,7 @@ npm run check-env
 npm start https://stripe.com https://www.adyen.com
 ```
 
-When it finishes, open `report.md` for the full competitive analysis.
+When it finishes, open `stripe_adyen_report.md` (or whatever companies you analyzed) for the full competitive analysis.
 
 ---
 
@@ -94,7 +94,7 @@ When it finishes, open `report.md` for the full competitive analysis.
     scrape-url ──────── Scrapes discovered subpages
           │
           ▼
-    write-report ────── Generates the final markdown report
+    write-report ────── Generates the final report (named by company)
 ```
 
 All browsing happens through **Steel's cloud browser** — bot detection, CAPTCHAs, and IP rotation are handled automatically. You can watch the agent work in real time via the live viewer URL printed at startup.

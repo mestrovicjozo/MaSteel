@@ -1,11 +1,23 @@
 import "dotenv/config";
 import { getSession, releaseSession } from "./session";
 import { agent } from "./agent";
+import { setReportFilename } from "./reportContext";
 
 // ---------------------------------------------------------------------------
 // 1. Parse competitor URLs from CLI args
 // ---------------------------------------------------------------------------
 const urls = process.argv.filter((arg) => arg.startsWith("http"));
+
+// Extract company name from URL (stripe.com -> stripe)
+function extractCompanyName(url: string): string {
+  try {
+    const hostname = new URL(url).hostname;
+    // Remove www. prefix and TLD (.com, .io, etc.)
+    return hostname.replace(/^www\./, '').split('.')[0];
+  } catch {
+    return 'unknown';
+  }
+}
 
 if (urls.length === 0) {
   console.error("Usage: npx tsx src/index.ts <url1> <url2> ...");
@@ -13,8 +25,14 @@ if (urls.length === 0) {
   process.exit(1);
 }
 
+// Generate unique filename from company names
+const companyNames = urls.map(extractCompanyName);
+const reportFilename = `${companyNames.join('_')}_report.md`;
+setReportFilename(reportFilename);
+
 console.log(`\n[MaSteel] Competitors to research: ${urls.length}`);
 urls.forEach((u, i) => console.log(`  ${i + 1}. ${u}`));
+console.log(`[MaSteel] Report will be saved as: ${reportFilename}`);
 
 // ---------------------------------------------------------------------------
 // 2. Run
@@ -59,7 +77,7 @@ urls.forEach((u, i) => console.log(`  ${i + 1}. ${u}`));
       console.log(`\n[Agent] ${result.text}`);
     }
 
-    console.log("\n[MaSteel] Done. Check report.md in the current directory.");
+    console.log(`\n[MaSteel] Done. Check ${reportFilename} in the current directory.`);
   } catch (err) {
     console.error("\n[MaSteel] Error:", err);
     process.exit(1);

@@ -2,17 +2,20 @@ import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import fs from "fs";
 import path from "path";
+import { getReportFilename } from "../reportContext";
 
 export const writeReport = createTool({
   id: "write-report",
   description:
-    "Writes the final competitive intelligence report to report.md in the current working directory. " +
+    "Writes the final competitive intelligence report to a file in the current working directory. " +
+    "The filename is automatically generated based on the companies being analyzed. " +
     "Call this exactly once at the end, after all research is complete.",
   inputSchema: z.object({
     content: z.string().describe("The full markdown report content to write"),
   }),
   execute: async ({ content }) => {
-    const filePath = path.resolve(process.cwd(), "report.md");
+    const filename = getReportFilename();
+    const filePath = path.resolve(process.cwd(), filename);
     fs.writeFileSync(filePath, content, "utf-8");
     console.log(`  [write-report] Report written to ${filePath}`);
     return { filePath, success: true };
