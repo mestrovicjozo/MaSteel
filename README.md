@@ -1,81 +1,103 @@
-# MaSteel — Competitive Intelligence Agent
-## Mastra + Steel
-> Drop in competitor URLs. Get a detailed report. No manual research required.
+# Steel + Mastra Competitive Intelligence Agent
 
-MaSteel is an AI agent that takes a list of base URLs, autonomously navigates competitor websites — including JavaScript-heavy sites with hidden menus — and produces a structured competitive intelligence report covering pricing, features, positioning, and more. [See an example report →](example_report.md)
+An AI agent that autonomously navigates competitor websites and generates detailed competitive intelligence reports covering pricing, features, and positioning.
+
+![Difficulty](https://img.shields.io/badge/Difficulty-Intermediate-yellow)
+![Time](https://img.shields.io/badge/Time-10%20min-blue)
+![Tech](https://img.shields.io/badge/TypeScript-blue)
 
 ---
 
-## How it works
+## TL;DR
 
-You give it base URLs. It does everything else:
+5 minute read. Drop in competitor URLs, get a structured competitive intelligence report with pricing, features, and positioning.
 
 ```bash
+git clone <repo-url>
+cd MaSteel
+npm install
+cp .env.example .env
+# Add your API keys to .env
 npm start https://stripe.com https://www.adyen.com
 ```
 
-The agent will:
-1. **Scrape each homepage** to understand company positioning
-2. **Search for subpages** (pricing, features, about) by scanning links
-3. **Explore hidden navigation** — hovers over dropdown menus, clicks hamburger buttons, scrolls to footers — to discover links that aren't in the static HTML
-4. **Scrape discovered pages** for detailed pricing, features, and company info
-5. **Write a structured report** comparing all competitors
-
-The result is a markdown report named after the companies analyzed (e.g., `stripe_adyen_report.md`), so each run preserves previous reports. See [example_report.md](example_report.md) for a finished report.
-
-### Why just base URLs?
-
-Most competitive intel tools require you to manually find and feed in every subpage URL. MaSteel doesn't. Its `explore-navigation` tool interacts with the page like a real user — hovering over nav items to reveal dropdowns, clicking mobile menu buttons — so it discovers pages that static link scrapers miss entirely. Sites like Braintree, which hide everything behind JavaScript navigation, work out of the box.
+[See an example report →](stripe_adyen_report.md)
 
 ---
 
-## Built with
+## What You'll Learn
 
-| Technology | Role |
-|-----------|------|
-| [**Steel**](https://steel.dev) | Cloud browser that bypasses bot detection, solves CAPTCHAs, and provides a live viewer to watch the agent browse in real time |
-| [**Mastra**](https://mastra.ai) | TypeScript AI agent framework that gives GPT-4o tools to control the browser and make decisions |
-| [**Playwright**](https://playwright.dev) | Browser automation — handles hover interactions, clicks, and DOM extraction |
-| [**OpenAI**](https://platform.openai.com) | GPT-4o-mini powers the agent's reasoning and report generation |
+- **Autonomous Navigation**: How to build an AI agent that explores JavaScript-heavy sites including hidden menus and dynamic content
+- **Cloud Browser Automation**: Use Steel's cloud browser to bypass bot detection and CAPTCHAs while scraping competitor sites
+- **AI-Powered Intelligence**: Leverage GPT-4o to analyze and synthesize competitive data into structured reports
 
 ---
 
-## Prerequisites
+## Installation
 
-| Requirement | Where to get it |
-|-------------|-----------------|
-| **Node.js** v18+ | [nodejs.org](https://nodejs.org) (LTS version) |
-| **OpenAI API key** | [platform.openai.com](https://platform.openai.com) → API Keys |
-| **Steel API key** | [app.steel.dev](https://app.steel.dev) → copy your API key |
+Clone the repository:
+
+```bash
+git clone <repo-url>
+cd MaSteel
+```
+
+### TypeScript/Node.js Setup
+
+```bash
+npm install
+```
+
+**Prerequisites:**
+- Node.js v18+ ([nodejs.org](https://nodejs.org))
+- OpenAI API key ([platform.openai.com](https://platform.openai.com) → API Keys)
+- Steel API key ([app.steel.dev](https://app.steel.dev) → copy your API key)
 
 ---
 
 ## Quick Start
 
+The agent will:
+
+- Scrape each homepage to understand company positioning
+- Search for subpages (pricing, features, about) by scanning links
+- Explore hidden navigation — hovers over dropdown menus, clicks hamburger buttons, scrolls to footers
+- Scrape discovered pages for detailed pricing, features, and company info
+- Generate a structured markdown report comparing all competitors
+
+### 1. Configure environment
+
+Create `.env`:
+
+```env
+OPENAI_API_KEY=sk-proj-...
+STEEL_API_KEY=steel_...
+```
+
+Or use the setup command:
 ```bash
-# 1. Clone and install
-git clone <repo-url>
-cd MaSteel
-npm install
-
-# 2. Set up API keys
 npm run setup
-# Edit .env with your real keys:
-#   OPENAI_API_KEY=sk-proj-...
-#   STEEL_API_KEY=steel_...
+# Edit .env with your real keys
+```
 
-# 3. Verify setup
-npm run check-env
+Get your free Steel API key: [app.steel.dev](https://app.steel.dev)
 
-# 4. Run it
+### 2. Run
+
+```bash
 npm start https://stripe.com https://www.adyen.com
 ```
 
-When it finishes, open `stripe_adyen_report.md` (or whatever companies you analyzed) for the full competitive analysis.
+When it finishes, open `stripe_adyen_report.md` for the full competitive analysis.
+
+**Verify your setup first:**
+```bash
+npm run check-env
+```
 
 ---
 
-## What the agent does under the hood
+## How It Works
 
 ```
   Base URLs (e.g. https://stripe.com)
@@ -99,6 +121,40 @@ When it finishes, open `stripe_adyen_report.md` (or whatever companies you analy
 
 All browsing happens through **Steel's cloud browser** — bot detection, CAPTCHAs, and IP rotation are handled automatically. You can watch the agent work in real time via the live viewer URL printed at startup.
 
+### Why Just Base URLs?
+
+Most competitive intel tools require you to manually find and feed in every subpage URL. MaSteel doesn't. Its `explore-navigation` tool interacts with the page like a real user — hovering over nav items to reveal dropdowns, clicking mobile menu buttons — so it discovers pages that static link scrapers miss entirely.
+
+---
+
+## Configuration
+
+Customize the agent by editing `src/agent.ts`:
+
+**Steel Session Configuration:**
+```typescript
+const session = await client.sessions.create({
+  useProxy: true,        // Use Steel's proxy network
+  solveCaptcha: true,     // Enable CAPTCHA solving
+  sessionTimeout: 1800000, // 30 minute timeout
+});
+```
+
+**Model Selection:**
+Edit `src/agent.ts` to change the AI model:
+```typescript
+const agent = new Agent({
+  name: 'competitive-intel-agent',
+  instructions: '...',
+  model: {
+    provider: 'OPEN_AI',
+    name: 'gpt-4o-mini-2024-07-18',  // Change model here
+    toolChoice: 'auto',
+  },
+  tools: { ... }
+});
+```
+
 ---
 
 ## Architecture
@@ -106,7 +162,7 @@ All browsing happens through **Steel's cloud browser** — bot detection, CAPTCH
 ```
 src/
   index.ts              ── Entry point, manages Steel session lifecycle
-  agent.ts              ── Mastra AI agent with GPT-4o-mini + tool definitions
+  agent.ts              ── Mastra AI agent with GPT-4o + tool definitions
   session.ts            ── Steel session + Playwright CDP connection (singleton)
   tools/
     scrapeUrl.ts        ── Visits a URL, extracts content as markdown
@@ -114,6 +170,33 @@ src/
     exploreNavigation.ts── Hovers/clicks nav elements to reveal hidden links
     writeReport.ts      ── Writes the final report to disk
 ```
+
+---
+
+## Error Handling
+
+The template includes proper cleanup:
+
+```typescript
+try {
+  // Your automation code
+} finally {
+  // Cleanup runs even if there's an error
+  if (browser) await browser.close();
+  if (session) await client.sessions.release(session.id);
+}
+```
+
+---
+
+## Built With
+
+| Technology | Role |
+|-----------|------|
+| [**Steel**](https://steel.dev) | Cloud browser that bypasses bot detection, solves CAPTCHAs, and provides a live viewer to watch the agent browse in real time |
+| [**Mastra**](https://mastra.ai) | TypeScript AI agent framework that gives GPT-4o tools to control the browser and make decisions |
+| [**Playwright**](https://playwright.dev) | Browser automation — handles hover interactions, clicks, and DOM extraction |
+| [**OpenAI**](https://platform.openai.com) | GPT-4o powers the agent's reasoning and report generation |
 
 ---
 
@@ -138,8 +221,9 @@ src/
 
 ---
 
-## Links
+## Support
 
-- [Steel — cloud browser sessions](https://steel.dev)
-- [Mastra — TypeScript agent framework](https://mastra.ai)
-- [OpenAI API](https://platform.openai.com)
+- [Steel Documentation](https://docs.steel.dev)
+- [Mastra Documentation](https://mastra.ai)
+- [OpenAI API Reference](https://platform.openai.com/docs)
+- [Discord Community](https://discord.gg/steel-dev)
